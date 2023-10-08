@@ -10,6 +10,10 @@ using namespace std;
 
 int main()
 {
+	// Setup file
+	FILE *f = freopen("C:\\Users\\lassj\\source\\repos\\RayTracing\\Output\\test.ppm", "w", stdout);
+
+
 	int image_width = 256;
 	int image_height = 256;
 
