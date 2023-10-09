@@ -2,6 +2,8 @@
 //
 
 #include "RayTracing.h"
+#include "color.h"
+#include "vec3.h"
 
 using namespace std;
 
@@ -11,7 +13,7 @@ using namespace std;
 int main()
 {
 	// Setup file
-	FILE *f = freopen("C:\\Users\\lassj\\source\\repos\\RayTracing\\Output\\test.ppm", "w", stdout);
+	FILE *f = freopen("C:\\Users\\lassj\\source\\repos\\RayTracing\\Output\\test2.ppm", "w", stdout);
 
 
 	int image_width = 256;
@@ -25,15 +27,9 @@ int main()
 		clog << "\rScanlines remaing: " << (image_height - j) << " " << std::flush;
 		for (int i = 0; i < image_width; i++)
 		{
-			auto r = double(i) / (image_width - 1);
-			auto g = double(j) / (image_height- 1);
-			auto b = 0;
-
-			int ir = static_cast<int>(255.999 * r);
-			int ig = static_cast<int>(255.999 * g);
-			int ib = static_cast<int>(255.999 * b);
-
-			cout << ir << " " << ig << " " << ib << endl;
+			auto c = color(double(i) / (image_width - 1), double(j) / (image_height - 1), 0);
+			write_color(cout, c);
+			
 		}
 	}
 	clog << "\rRendering done                          \n";
