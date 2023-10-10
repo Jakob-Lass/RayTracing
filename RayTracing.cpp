@@ -19,7 +19,7 @@ using namespace std;
 color ray_color(const ray& r, const hittable& world) {
 
 	hit_record hr;
-	if (world.hit(r,0,infinity,hr))
+	if (world.hit(r,interval(0,infinity),hr))
 	{
 		return 0.5*(hr.normal + color(1.0, 1.0, 1.0));
 	}

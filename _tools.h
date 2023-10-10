@@ -6,6 +6,7 @@
 #include <limits>
 #include <memory>
 
+
 // Usings section
 
 using std::shared_ptr;
@@ -28,7 +29,7 @@ inline double deg2rad(double degrees)
 
 #include "ray.h"
 #include "vec3.h"
-
+#include "interval.h"
 
 #endif // !_TOOLS_H
 

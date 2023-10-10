@@ -9,7 +9,7 @@ class sphere :public hittable {
 public:
 	sphere(point3 _center, double _radius) : center(_center), radius(_radius) {}
 
-	bool hit(const ray& r, double t_min, double t_max, hit_record& hr) const override
+	bool hit(const ray& r, interval ray_t, hit_record& hr) const override
 	{
 		vec3 oc = r.origin() - center;
 		auto a = r.direction().length_squared();
@@ -22,10 +22,10 @@ public:
 
 		auto root = (-halfb - sqrtD) / a;
 
-		if (root <= t_min || root >= t_max) // if first root is outside allowed time
+		if (!ray_t.surrounds(root)) // if first root is outside allowed time
 		{
 			root = (-halfb + sqrtD) / a; // calculate the other
-			if (root <= t_min || root >= t_max) return false;
+			if (!ray_t.surrounds(root)) return false;
 		}
 		// Else! we have the root we want
 
