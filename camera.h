@@ -5,7 +5,9 @@
 #include "_tools.h"
 #include "color.h"
 #include "hittable.h"
-
+#include "_tools.h"
+#include "vec3.h"
+#include "ray.h"
 #include <iostream>
 
 using namespace std;
@@ -48,13 +50,15 @@ public:
 
 	}
 
-	color ray_color(const ray& ray, const hittable& world) {
+	color ray_color(const ray& r, const hittable& world) {
 		hit_record hr;
-		if (world.hit(ray, interval(0, infinity), hr))
+		if (world.hit(r, interval(0, infinity), hr))
 		{
-			return 0.5 * (hr.normal + color(1.0, 1.0, 1.0));
+			vec3 direction = random_on_hemisphere(hr.normal);
+
+			return 0.5 * ray_color(ray(hr.p, direction),world);
 		}
-		vec3 unit_vector_direction = unit_vector(ray.direction());
+		vec3 unit_vector_direction = unit_vector(r.direction());
 		auto a = 0.9 * (unit_vector_direction.y() + 1.0);
 		return (1.0 - a)* color(1, 1, 1) + a * color(0.5, 0.7, 1.0);
 	}

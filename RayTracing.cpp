@@ -38,7 +38,7 @@ int main()
 	cam.image_width = image_width;
 	cam.samples_per_pixel = 100;
 
-	const char *file = "C:\\Users\\lassj\\source\\repos\\RayTracing\\Output\\test3.ppm";
+	const char *file = "C:\\Users\\lassj\\source\\repos\\RayTracing\\Output\\test4.ppm";
 	
 	cam.render(world,file);
 
