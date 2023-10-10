@@ -7,9 +7,9 @@
 
 class sphere :public hittable {
 public:
-	sphere(point3 _centre, double _radius) : center(_center), radius(_radius) {}
+	sphere(point3 _center, double _radius) : center(_center), radius(_radius) {}
 
-	bool hit(const ray& ray, double t_min, double t_max, hit_record& hr)
+	bool hit(const ray& r, double t_min, double t_max, hit_record& hr) const override
 	{
 		vec3 oc = r.origin() - center;
 		auto a = r.direction().length_squared();
@@ -20,27 +20,28 @@ public:
 		
 		auto sqrtD = sqrt(D);
 
-		auto root = (-halfb - Dsq) / a;
+		auto root = (-halfb - sqrtD) / a;
 
 		if (root <= t_min || root >= t_max) // if first root is outside allowed time
 		{
-			root = (-halfb + Dsq) / a; // calculate the other
+			root = (-halfb + sqrtD) / a; // calculate the other
 			if (root <= t_min || root >= t_max) return false;
 		}
 		// Else! we have the root we want
 
-		rec.t = root;
-		rec.p = r.at(root);
-		vec3 outward_normal = (rec.p - center) / radius; // unit normal
-		rec.set_face_normal(ray, outward_normal);
+		hr.t = root;
+		hr.p = r.at(hr.t);
+		hr.normal = (hr.p - center) / radius;
+		vec3 outward_normal = (hr.p - center) / radius; // unit normal
+		hr.set_face_normal(r, outward_normal);
 
-
-		return true
+		
+		return true;
 	}
 
 private:
 	point3 center;
-	double radius
+	double radius;
 };
 
 #endif
