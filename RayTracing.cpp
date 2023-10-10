@@ -5,6 +5,7 @@
 #include "color.h"
 #include "ray.h"
 #include "vec3.h"
+#include "hittable.h"
 
 using namespace std;
 
