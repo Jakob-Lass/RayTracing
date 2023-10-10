@@ -16,9 +16,10 @@ using namespace std;
 class camera {
 public:
 
-	double aspect_ratio = 1.0;
-	int image_width = 100;
-	int samples_per_pixel = 10;
+	double	aspect_ratio		= 1.0;
+	int		image_width			= 100;
+	int		samples_per_pixel	= 10;
+	int		max_depth			= 10;
 
 	void render(const hittable& world, const char* file)
 	{
@@ -38,7 +39,7 @@ public:
 				for (int sample = 0; sample < samples_per_pixel; sample++)
 				{
 					ray r = get_ray(i, j);
-					pixel_color += ray_color(r, world);
+					pixel_color += ray_color(r, max_depth, world);
 				}
 				
 				//auto c = color(double(i) / (image_width - 1), double(j) / (image_height - 1), 0);
@@ -50,13 +51,17 @@ public:
 
 	}
 
-	color ray_color(const ray& r, const hittable& world) {
+	color ray_color(const ray& r, int depth, const hittable& world) {
 		hit_record hr;
+		if (depth <= 0)
+		{	
+			return color(0.0, 0.0, 0.0); // Reached max depth
+		}
 		if (world.hit(r, interval(0, infinity), hr))
 		{
 			vec3 direction = random_on_hemisphere(hr.normal);
 
-			return 0.5 * ray_color(ray(hr.p, direction),world);
+			return 0.5 * ray_color(ray(hr.p, direction), depth-1,world);
 		}
 		vec3 unit_vector_direction = unit_vector(r.direction());
 		auto a = 0.9 * (unit_vector_direction.y() + 1.0);
