@@ -1,5 +1,11 @@
 ﻿// RayTracing.cpp : Defines the entry point for the application.
 //
+#include "_tools.h"
+
+#include "color.h"
+#include "hittable.h"
+#include "hittable_list.h"
+#include "sphere.h"
 
 #include "RayTracing.h"
 #include "color.h"
@@ -10,28 +16,12 @@
 using namespace std;
 
 
-double hit_sphere(const point3& center, double radius, const ray& r)
-{
-	vec3 oc = r.origin() - center;
-	auto a = r.direction().length_squared();
-	auto halfb =dot(oc, r.direction());
-	auto c = oc.length_squared() - radius * radius;
-	auto D = halfb*halfb - a * c;
-	if (D < 0) 
-	{
-		return -1.0;
-	}
-	else
-	{
-		return (-halfb - sqrt(D)) / a;
-	}
-}
+color ray_color(const ray& r, const hittable& world) {
 
-
-color ray_color(const ray& r) {
-	if (hit_sphere(point3(0.0, 0.25, -1.0), 0.5, r)>0.0)
+	hit_record hr;
+	if (world.hit(r,0,infinity,hr))
 	{
-		return color(1.0, 0.0, 0.0);
+		return 0.5*(hr.normal + color(1.0, 1.0, 1.0));
 	}
 	vec3 unit_vector_direction = unit_vector(r.direction());
 	auto a = 0.9 * (unit_vector_direction.y() + 1.0);
@@ -47,6 +37,13 @@ int main()
 	int image_width = 400; // Wanted width
 	int image_height = static_cast<int>(image_width / aspect_ratio);
 	image_height = (image_height < 1) ? 1 : image_height; // make sure the image height is at least 1 pixel
+
+	// Setup WORLD
+
+	hittable_list world;
+	world.add(make_shared<sphere>(point3(0, 0, -1), 0.5));
+	world.add(make_shared<sphere>(point3(0, -100.5, -1), 100));
+
 
 	// Setup camera
 	
@@ -88,7 +85,7 @@ int main()
 			auto ray_direction = pixel_center - camera_centre;
 			ray r(camera_centre, ray_direction);
 
-			color pixel_color = ray_color(r);
+			color pixel_color = ray_color(r,world);
 			//auto c = color(double(i) / (image_width - 1), double(j) / (image_height - 1), 0);
 			write_color(cout, pixel_color);
 			
