@@ -7,10 +7,21 @@
 
 using color = vec3;
 
-void write_color(std::ostream& out, const color c)
+static const interval intensity(0.000, 0.999);
+
+void write_color(std::ostream& out, const color c, int samples_per_pixel)
 {
-	out << static_cast<int>(255.999 * c.x()) << ' '
-		<< static_cast<int>(255.999 * c.y()) << ' '
-		<< static_cast<int>(255.999 * c.z()) << '\n';
+	auto r = c.x();
+	auto g = c.y();
+	auto b = c.z();
+
+	auto scale = 1.0 / samples_per_pixel;
+	r *= scale;
+	g *= scale;
+	b *= scale;
+
+	out << static_cast<int>(256 * intensity.clamp(r)) << ' '
+		<< static_cast<int>(256 * intensity.clamp(g)) << ' '
+		<< static_cast<int>(256 * intensity.clamp(b)) << '\n';
 }
 #endif 
