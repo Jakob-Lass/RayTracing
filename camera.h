@@ -57,9 +57,9 @@ public:
 		{	
 			return color(0.0, 0.0, 0.0); // Reached max depth
 		}
-		if (world.hit(r, interval(0, infinity), hr))
+		if (world.hit(r, interval(0.0000001, infinity), hr))
 		{
-			vec3 direction = random_on_hemisphere(hr.normal);
+			vec3 direction = hr.normal+random_unit_vector();
 
 			return 0.5 * ray_color(ray(hr.p, direction), depth-1,world);
 		}
