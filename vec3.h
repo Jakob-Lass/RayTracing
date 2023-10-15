@@ -60,6 +60,10 @@ class vec3 {
 			return vec3(random_range(min,max), random_range(min, max), random_range(min, max));
 		}
 
+		bool near_zero() const {
+			auto a_tol = 1e-8;
+			return (fabs(e[0]) < a_tol) && (fabs(e[1]) < a_tol) && (fabs(e[2]) < a_tol);
+		}
 		
 };
 
@@ -142,5 +146,12 @@ inline vec3 random_on_hemisphere(const vec3& normal)
 	else return -rand_unit_vec;
 }
 
+
+
+vec3 reflect(const vec3& r_in, const vec3& normal)
+{
+
+	return r_in - 2 * dot(r_in, normal) * normal;
+}
 
 #endif

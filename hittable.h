@@ -2,12 +2,16 @@
 #define HITTABLE_H
 
 #include "ray.h"
+#include "RayTracing.h"
 
+class material;
 
 class hit_record {
 public:
 	point3 p; // Intersection point
 	vec3 normal; // normal to surface at p
+
+	shared_ptr<material> mat; // entry point for the material
 	double t; // Intersection 'time'
 
 	bool front_face;
@@ -28,6 +32,8 @@ public:
 	
 	virtual bool hit(const ray& r, interval  ray_t, hit_record& rec) const = 0;
 
+private:
+	color albedo;
 };
 
 

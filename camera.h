@@ -8,6 +8,7 @@
 #include "_tools.h"
 #include "vec3.h"
 #include "ray.h"
+#include "material.h"
 #include <iostream>
 
 using namespace std;
@@ -59,9 +60,13 @@ public:
 		}
 		if (world.hit(r, interval(0.0000001, infinity), hr))
 		{
-			vec3 direction = hr.normal+random_unit_vector();
-
-			return 0.5 * ray_color(ray(hr.p, direction), depth-1,world);
+			ray r_out;
+			color attenuation;
+			if (hr.mat->scatter(r, hr, attenuation, r_out))
+			{
+				return attenuation*ray_color(r_out, depth - 1, world);
+			}
+			return color(0, 0, 0);
 		}
 		vec3 unit_vector_direction = unit_vector(r.direction());
 		auto a = 0.9 * (unit_vector_direction.y() + 1.0);
