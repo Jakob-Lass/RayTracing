@@ -148,10 +148,18 @@ inline vec3 random_on_hemisphere(const vec3& normal)
 
 
 
-vec3 reflect(const vec3& r_in, const vec3& normal)
+inline vec3 reflect(const vec3& r_in, const vec3& normal)
 {
 
 	return r_in - 2 * dot(r_in, normal) * normal;
+}
+
+inline vec3 refract(const vec3& r_in, const vec3& normal, double etai_over_etat)
+{
+	double cos_theta = fmin(dot(-r_in, normal), 1);
+	vec3 r_out = etai_over_etat * (r_in + cos_theta * normal);
+	r_out += -sqrt(1 - r_out.length_squared()) * normal;
+	return r_out;
 }
 
 #endif

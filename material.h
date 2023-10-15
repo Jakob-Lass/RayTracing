@@ -43,22 +43,57 @@ private:
 class metal: public material
 {
 public:
-	metal(const color& col) : albedo(col) {}
+	metal(const color& col, double f) : albedo(col), fuzz(f<1?f:1) {}
+
+
 
 	bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& r_out)
 		const override {
-		vec3 reflected = reflect(unit_vector(r_in.direction()), rec.normal);
+		vec3 reflected = reflect(unit_vector(r_in.direction()), rec.normal)+
+			fuzz*random_unit_vector();
 		r_out = ray(rec.p, reflected);
 		attenuation = albedo;
-		return true;
+		return dot(r_out.direction(), rec.normal)>0;
 	}
 
 private:
 	color albedo;
+	double fuzz; // fuzzyness
 };
 
 
+class dielectric : public material
+{
+public:
+	dielectric(double index_of_refraction) : ir(index_of_refraction) {}
 
+	bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& r_out)
+		const override {
+		attenuation = color(1, 1, 1); // could be changed
+		double refraction_ratio = rec.front_face ? (1.0 / ir) : ir; // if inside to outside, reverse reflective index
+
+		// check if refraction is possible
+		auto unit_direction = unit_vector(r_in.direction());
+
+		double cos_theta = fmin(dot(-unit_direction, rec.normal),1);
+		double sin_theta = sqrt(1 - cos_theta * cos_theta);
+		vec3 direction;
+		if (refraction_ratio * sin_theta > 1) // Only reflection is allowed!
+		{
+			direction = reflect(unit_direction, rec.normal);
+		}
+		else 
+		{
+			direction = refract(unit_direction, rec.normal, refraction_ratio);
+		}
+
+		r_out = ray(rec.p, direction);
+		return true;
+	}
+
+private:
+	double ir;
+};
 
 
 #endif // !MATERIAL_H
