@@ -364,3 +364,4 @@ FodyWeavers.xsd
 
 # local output files
 Output/*
+!Output/final.ppm
