@@ -39,6 +39,7 @@ int main()
 	world.add(make_shared<sphere>(point3(0.0, -100.5, -1.0), 100.0, material_ground));
 	world.add(make_shared<sphere>(point3(0.0, 0.0, -1.0), 0.5, material_center));
 	world.add(make_shared<sphere>(point3(-1.0, 0.0, -1.0), 0.5, material_left));
+	world.add(make_shared<sphere>(point3(-1.0, 0.0, -1.0), -0.4, material_left));
 	world.add(make_shared<sphere>(point3(1.0, 0.0, -1.0), 0.5, material_right));
 
 	camera cam;
@@ -47,7 +48,7 @@ int main()
 	cam.samples_per_pixel = 100;
 	cam.max_depth = 100;
 
-	const char *file = "C:\\Users\\lassj\\source\\repos\\RayTracing\\Output\\test11.ppm";
+	const char *file = "C:\\Users\\lassj\\source\\repos\\RayTracing\\Output\\test12.ppm";
 	
 	cam.render(world,file);
 
