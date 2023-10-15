@@ -40,6 +40,10 @@ inline double random_range(double min, double max)
 	return min + (max - min) * random_double();
 }
 
+inline int random_int(int min, int max) {
+    return static_cast<int>(random_range(min, max));
+}
+
 // Common Headers
 
 #include "ray.h"

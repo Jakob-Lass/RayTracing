@@ -14,6 +14,10 @@
 #include "hittable.h"
 #include "material.h"
 #include "camera.h"
+#include "bvh.h"
+
+// timing
+#include <chrono>
 
 using namespace std;
 
@@ -23,6 +27,7 @@ using namespace std;
 
 int main()
 {
+    
 	// Setup WORLD
 
 	hittable_list world;
@@ -68,11 +73,13 @@ int main()
     auto material3 = make_shared<metal>(color(0.7, 0.6, 0.5), 0.0);
     world.add(make_shared<sphere>(point3(4, 1, 0), 1.0, material3));
 
+    
+
     camera cam;
 
     cam.aspect_ratio = 16.0 / 9.0;
     cam.image_width = 1200;
-    cam.samples_per_pixel = 500;
+    cam.samples_per_pixel = 100;
     cam.max_depth = 50;
 
     cam.vfov = 20;
@@ -84,12 +91,19 @@ int main()
     cam.focus_dist = 10.0;
 	
 
-	const char *file = "C:\\Users\\lassj\\source\\repos\\RayTracing\\Output\\final.ppm";
-	
+	const char *file = "C:\\Users\\lassj\\source\\repos\\RayTracing\\Output\\final_un_optimized.ppm";
+    const char* file2= "C:\\Users\\lassj\\source\\repos\\RayTracing\\Output\\final_optimized.ppm";
+    std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 	cam.render(world,file);
+    std::chrono::steady_clock::time_point mid = std::chrono::steady_clock::now();
 
+    world = hittable_list(make_shared<bvh_node>(world));
+    cam.render(world, file2);
 
-	
+    std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+    std::clog << "Time   optimized = " << std::chrono::duration_cast<std::chrono::microseconds>(end - mid).count()/1000000.0 << "[s]" << std::endl;
+    std::clog << "Time unoptimized = " << std::chrono::duration_cast<std::chrono::microseconds>(mid - begin).count() / 1000000.0 << "[s]" << std::endl;
+
 	
 	return 0;
 }
