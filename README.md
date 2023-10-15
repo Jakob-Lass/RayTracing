@@ -3,5 +3,5 @@ Repository follwing the [_Ray Tracing in One Weekend_](https://raytracing.github
 
 Resulting image below:
 
-<img src="../../Output/final.png" alt="final" width="1024"/>
+<img src="https://github.com/Jakob-Lass/RayTracing/blob/master/Output/final.png" alt="final" width="1024"/>
 
