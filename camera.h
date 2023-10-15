@@ -22,6 +22,13 @@ public:
 	int		samples_per_pixel	= 10;
 	int		max_depth			= 10;
 
+	double vfov = 90; // field of view vertically in degrees
+
+	point3 look_from = point3(0.0, 0.0, -1.0); // Origin of camera
+	point3 look_at = point3(0.0, 0.0, 0.0); // Point to look at
+	vec3 vup = vec3(0.0, 1.0, 0.0); // Local up-direction
+
+
 	void render(const hittable& world, const char* file)
 	{
 		initialize();
@@ -76,37 +83,46 @@ public:
 private:
 
 
-	point3 center;
+	point3 camera_centre;
 	point3 pixel_00_location;
 	int image_height;
 
 	vec3   pixel_delta_u;  // Offset to pixel to the right
 	vec3   pixel_delta_v;  // Offset to pixel below
+	vec3   u, v, w;        // Camera basis vectors
 
 	void initialize()
 	{
 		image_height = static_cast<int>(image_width / aspect_ratio);
 		image_height = (image_height < 1) ? 1 : image_height; // make sure the image height is at least 1 pixel
 		
-
+		camera_centre = look_from;
 		// Setup camera
 
-		auto focal_length = 1.0; // eye distance from the view port
-		auto view_port_height = 2.0; // height of view port
+		auto focal_length = (look_from-look_at).length(); // eye distance from the view port
+		auto theta = deg2rad(vfov); // Vertical field of view in radians
+		auto h = tan(theta / 2.0); // Calculate height 
+		auto view_port_height = 2.0 * h * focal_length; // height of view port
 		auto view_port_width = view_port_height * (static_cast<double>(image_width) / image_height);
 
-		auto camera_centre = point3(0.0, 0.0, 0.0);
+		
+
+		// Calculate u,v, and w
+		w = unit_vector(look_from - look_at);
+		u = unit_vector(cross(vup, w));
+		v = cross(w, u);
+
 
 		// Calculation of vectors across view port
-		auto view_port_u = vec3(view_port_width, 0.0, 0.0);
-		auto view_port_v = vec3(0.0, -view_port_height, 0.0); // y axis starts top left and goes down
+		vec3 view_port_u = view_port_width * u;
+		vec3 view_port_v = view_port_height * -v; // y axis starts top left and goes down
 
 		// Calculate pixel sizes
 		pixel_delta_u = view_port_u / image_width;
 		pixel_delta_v = view_port_v / image_height;
 
 		// Calculate corner position, pixel 0,0 is located half a pixel down and to the right of upper left corner
-		auto view_port_upper_left_corner = camera_centre + vec3(0.0, 0.0, -focal_length) - view_port_u * 0.5 - view_port_v * 0.5;
+		auto view_port_upper_left_corner = camera_centre -(focal_length*w) - view_port_u * 0.5 - view_port_v * 0.5;
 		pixel_00_location = view_port_upper_left_corner + 0.5 * (pixel_delta_u + pixel_delta_v);
 
 
@@ -117,10 +133,8 @@ private:
 		auto pixel_center = pixel_00_location + (i * pixel_delta_u) + (j * pixel_delta_v);
 		auto pixel_sample = pixel_center + pixel_sample_square();
 
-		auto ray_origin = center;
-
-		auto ray_direction = pixel_sample - center;
-		return ray(ray_origin, ray_direction);
+		auto ray_direction = pixel_sample - camera_centre;
+		return ray(camera_centre, ray_direction);
 	}
 
 	vec3 pixel_sample_square() const

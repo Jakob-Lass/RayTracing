@@ -45,10 +45,17 @@ int main()
 	camera cam;
 	cam.aspect_ratio = aspect_ratio;
 	cam.image_width = image_width;
-	cam.samples_per_pixel = 100;
-	cam.max_depth = 100;
+	cam.samples_per_pixel = 200;
+	cam.max_depth = 50;
+	
+	cam.vfov = 20;
+	 
+	cam.look_from = point3(-2, 2, 1);
+	cam.look_at = point3(0, 0, -1);
+	cam.vup = vec3(0, 1, 0);
+	
 
-	const char *file = "C:\\Users\\lassj\\source\\repos\\RayTracing\\Output\\test12.ppm";
+	const char *file = "C:\\Users\\lassj\\source\\repos\\RayTracing\\Output\\test15.ppm";
 	
 	cam.render(world,file);
 
