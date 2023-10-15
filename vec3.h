@@ -162,4 +162,14 @@ inline vec3 refract(const vec3& r_in, const vec3& normal, double etai_over_etat)
 	return r_out;
 }
 
+inline vec3 random_in_unit_disk() {
+	while (true)
+	{
+		auto p = vec3(random_range(-1, 1), random_range(-1, 1), 0.0);
+		if (p.length() < 1)
+			return p;
+
+	}
+}
+
 #endif

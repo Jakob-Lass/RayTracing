@@ -28,6 +28,10 @@ public:
 	point3 look_at = point3(0.0, 0.0, 0.0); // Point to look at
 	vec3 vup = vec3(0.0, 1.0, 0.0); // Local up-direction
 
+	double defocus_angle = 0; // defocusing angle used to generate blur, variation of the angle hitting each pixel
+	double focus_dist = 10; // Distance from camera look from to plane in perfect focus
+
+
 
 	void render(const hittable& world, const char* file)
 	{
@@ -91,6 +95,10 @@ private:
 	vec3   pixel_delta_v;  // Offset to pixel below
 	vec3   u, v, w;        // Camera basis vectors
 
+	vec3 defocus_disc_u, defocus_disc_v; // Vectors to control defocus disk
+
+
+
 	void initialize()
 	{
 		image_height = static_cast<int>(image_width / aspect_ratio);
@@ -99,10 +107,10 @@ private:
 		camera_centre = look_from;
 		// Setup camera
 
-		auto focal_length = (look_from-look_at).length(); // eye distance from the view port
+		//auto focal_length = (look_from-look_at).length(); // eye distance from the view port
 		auto theta = deg2rad(vfov); // Vertical field of view in radians
 		auto h = tan(theta / 2.0); // Calculate height 
-		auto view_port_height = 2.0 * h * focal_length; // height of view port
+		auto view_port_height = 2.0 * h * focus_dist; // height of view port
 		auto view_port_width = view_port_height * (static_cast<double>(image_width) / image_height);
 
 		
@@ -122,19 +130,35 @@ private:
 		pixel_delta_v = view_port_v / image_height;
 
 		// Calculate corner position, pixel 0,0 is located half a pixel down and to the right of upper left corner
-		auto view_port_upper_left_corner = camera_centre -(focal_length*w) - view_port_u * 0.5 - view_port_v * 0.5;
+		auto view_port_upper_left_corner = camera_centre -(focus_dist*w) - view_port_u * 0.5 - view_port_v * 0.5;
 		pixel_00_location = view_port_upper_left_corner + 0.5 * (pixel_delta_u + pixel_delta_v);
+
+
+		// Apply the camera defocusing
+		auto defocus_radius = focus_dist * tan(deg2rad(defocus_angle)); // radius of disk
+		defocus_disc_u = defocus_radius * u;
+		defocus_disc_v = defocus_radius * v;
 
 
 	}
 
 	ray get_ray(int i, int j)
 	{
+		// Find ray taking defocusing into account
 		auto pixel_center = pixel_00_location + (i * pixel_delta_u) + (j * pixel_delta_v);
 		auto pixel_sample = pixel_center + pixel_sample_square();
 
-		auto ray_direction = pixel_sample - camera_centre;
-		return ray(camera_centre, ray_direction);
+		auto ray_origin = (defocus_angle <= 0) ? camera_centre : defocus_disk_sample();
+
+		auto ray_direction = pixel_sample - ray_origin;
+		return ray(ray_origin, ray_direction);
+	}
+
+	point3 defocus_disk_sample() const
+	{
+		//return random point on defocus disk
+		auto p = random_in_unit_disk();
+		return camera_centre + (p[0] * defocus_disc_u) + (p[1] * defocus_disc_v);
 	}
 
 	vec3 pixel_sample_square() const

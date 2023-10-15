@@ -53,9 +53,12 @@ int main()
 	cam.look_from = point3(-2, 2, 1);
 	cam.look_at = point3(0, 0, -1);
 	cam.vup = vec3(0, 1, 0);
+
+	cam.defocus_angle = 10.0;
+	cam.focus_dist = 3.4;
 	
 
-	const char *file = "C:\\Users\\lassj\\source\\repos\\RayTracing\\Output\\test15.ppm";
+	const char *file = "C:\\Users\\lassj\\source\\repos\\RayTracing\\Output\\test16.ppm";
 	
 	cam.render(world,file);
 
